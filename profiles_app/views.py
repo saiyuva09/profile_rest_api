@@ -1,9 +1,15 @@
-from django.shortcuts import render
+#from django.shortcuts import render
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from profiles_app import serializers
 from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication
+
+from profiles_app import models
+from profiles_app import serializers
+from profiles_app import permissions
+
 # Create your views here.
 
 
@@ -62,7 +68,7 @@ class HelloViewSet(viewsets.ViewSet):
                 serializer.errors,
                 status = status.HTTP_400_BAD_REQUEST
             )
-    def retrive(self, request, pk=None):
+    def retrieve(self, request, pk=None):
         return Response({'http_method':'GET'})
 
     def update(self, request, pk=None):
@@ -71,5 +77,12 @@ class HelloViewSet(viewsets.ViewSet):
     def partial_update(self, request, pk=None):
         return Response({'http_method':'PATCH'})
 
-    def destory(self, request, pk=None):
+    def destroy(self, request, pk=None):
         return Response({'http_method':'DELETE'})
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.UserProfileSerializer
+    queryset = models.UserProfile.objects.all()
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (permissions.UpdateOwnProfile,)
